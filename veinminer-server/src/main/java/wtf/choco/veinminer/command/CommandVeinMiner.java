@@ -57,7 +57,7 @@ public final class CommandVeinMiner implements Command {
 
         if (args[0].equalsIgnoreCase("reload")) {
             if (!sender.hasPermission(VeinMinerConstants.PERMISSION_COMMAND_RELOAD)) {
-                sender.sendMessage(ChatFormat.RED + "You have insufficient permissions to execute this command.");
+                sender.sendMessage(ChatFormat.RED + "このコマンドを実行するには権限が不足しています。");
                 return true;
             }
 
@@ -72,7 +72,7 @@ public final class CommandVeinMiner implements Command {
                 veinMinerPlayer.setClientConfig(veinMiner.createClientConfig(veinMinerPlayer.getPlayer()));
             });
 
-            sender.sendMessage(ChatFormat.GREEN + "VeinMiner configuration successfully reloaded.");
+            sender.sendMessage(ChatFormat.GREEN + "VeinMinerの設定を再読込しました!");
             return true;
         }
 
@@ -82,10 +82,10 @@ public final class CommandVeinMiner implements Command {
 
             sender.sendMessage(headerFooter);
             sender.sendMessage("");
-            sender.sendMessage(ChatFormat.GOLD + "Version: " + ChatFormat.WHITE + details.version() + getUpdateSuffix());
-            sender.sendMessage(ChatFormat.GOLD + "Developer: " + ChatFormat.WHITE + details.author());
-            sender.sendMessage(ChatFormat.GOLD + "Plugin page: " + ChatFormat.WHITE + details.website());
-            sender.sendMessage(ChatFormat.GOLD + "Source code: " + ChatFormat.WHITE + "https://github.com/2008Choco/VeinMiner");
+            sender.sendMessage(ChatFormat.GOLD + "バージョン: " + ChatFormat.WHITE + details.version() + getUpdateSuffix());
+            sender.sendMessage(ChatFormat.GOLD + "開発者: " + ChatFormat.WHITE + details.author());
+            sender.sendMessage(ChatFormat.GOLD + "プラグインページ: " + ChatFormat.WHITE + details.website());
+            sender.sendMessage(ChatFormat.GOLD + "ソースコード: " + ChatFormat.WHITE + "https://github.com/KyousabaMC/VeinMiner");
             sender.sendMessage("");
             sender.sendMessage(headerFooter);
             return true;
@@ -93,12 +93,12 @@ public final class CommandVeinMiner implements Command {
 
         else if (args[0].equalsIgnoreCase("toggle")) {
             if (!(sender instanceof PlatformPlayer player)) {
-                sender.sendMessage("Vein miner cannot be toggled from the console.");
+                sender.sendMessage("一括破壊はコンソールからは切り替えられません。");
                 return true;
             }
 
             if (!canVeinMine(player) || !player.hasPermission(VeinMinerConstants.PERMISSION_COMMAND_TOGGLE)) {
-                player.sendMessage(ChatFormat.RED + "You have insufficient permissions to execute this command.");
+                player.sendMessage(ChatFormat.RED + "このコマンドを実行するには権限が不足しています。");
                 return true;
             }
 
@@ -111,28 +111,30 @@ public final class CommandVeinMiner implements Command {
             if (args.length >= 2) {
                 VeinMinerToolCategory category = veinMiner.getToolCategoryRegistry().get(args[1]);
                 if (category == null) {
-                    player.sendMessage(ChatFormat.RED + "Invalid tool category " + args[1] + ".");
+                    player.sendMessage(ChatFormat.RED + "無効なツールカテゴリ: " + args[1] + ".");
                     return true;
                 }
 
                 veinMinerPlayer.setVeinMinerEnabled(category, !veinMinerPlayer.isVeinMinerEnabled(category));
-                player.sendMessage(ChatFormat.GRAY + "Vein miner toggled "
+                player.sendMessage(ChatFormat.YELLOW + category.getId().toLowerCase()
+                    + ChatFormat.GRAY + "の一括破壊を "
                     + (veinMinerPlayer.isVeinMinerEnabled(category)
                             ? ChatFormat.GREEN.toString() + ChatFormat.BOLD + "ON"
                             : ChatFormat.RED.toString() + ChatFormat.BOLD + "OFF"
                     )
-                    + ChatFormat.GRAY + " for tool " + ChatFormat.YELLOW + category.getId().toLowerCase() + ChatFormat.GRAY + ".");
+                    + ChatFormat.GRAY + "に切り替えました。");
             }
 
             // Toggle all tools
             else {
                 veinMinerPlayer.setVeinMinerEnabled(!veinMinerPlayer.isVeinMinerEnabled());
-                player.sendMessage(ChatFormat.GRAY + "Vein miner toggled "
+                player.sendMessage(ChatFormat.YELLOW + "全ツール"
+                    + ChatFormat.GRAY + "の一括破壊を "
                     + (veinMinerPlayer.isVeinMinerDisabled()
                             ? ChatFormat.RED.toString() + ChatFormat.BOLD + "OFF"
                             : ChatFormat.GREEN.toString() + ChatFormat.BOLD + "ON"
                     )
-                    + ChatFormat.GRAY + " for " + ChatFormat.YELLOW + "all tools" + ChatFormat.GRAY + ".");
+                    + ChatFormat.GRAY + " に切り替えました。");
             }
 
             return true;
@@ -140,12 +142,12 @@ public final class CommandVeinMiner implements Command {
 
         else if (args[0].equalsIgnoreCase("mode")) {
             if (!(sender instanceof PlatformPlayer player)) {
-                sender.sendMessage("Vein miner modes cannot be changed from the console.");
+                sender.sendMessage("一括破壊のモードをコンソールから切り替えることはできません。");
                 return true;
             }
 
             if (!canVeinMine(player) || !player.hasPermission(VeinMinerConstants.PERMISSION_COMMAND_MODE)) {
-                player.sendMessage(ChatFormat.RED + "You have insufficient permissions to execute this command.");
+                player.sendMessage(ChatFormat.RED + "このコマンドを実行するには権限が不足しています。");
                 return true;
             }
 
@@ -156,7 +158,7 @@ public final class CommandVeinMiner implements Command {
 
             Optional<ActivationStrategy> strategyOptional = EnumUtil.get(ActivationStrategy.class, args[1].toUpperCase());
             if (!strategyOptional.isPresent()) {
-                player.sendMessage(ChatFormat.RED + "Invalid mode " + args[1] + ".");
+                player.sendMessage(ChatFormat.RED + "無効なモード: " + args[1] + "");
                 return true;
             }
 
@@ -167,20 +169,20 @@ public final class CommandVeinMiner implements Command {
             }
 
             if (strategy == ActivationStrategy.CLIENT && !veinMinerPlayer.isUsingClientMod()) {
-                player.sendMessage(ChatFormat.RED + "You do not have the VeinMiner Companion mod installed on your client!");
+                player.sendMessage(ChatFormat.RED + "クライアントに " + ChatFormat.YELLOW + "VeinMiner Companion Mod" + ChatFormat.RED + "がインストールされていません!");
 
                 // Let them know where to install VeinMiner on the client (if it's allowed)
                 if (veinMinerPlayer.getClientConfig().isAllowActivationKeybind()) {
-                    player.sendMessage("In order to use client activation, you must install a client-sided mod.");
+                    player.sendMessage("クライアントアクティベーションを使用するには、クライアントにMODをインストールする必要があります。");
                     player.sendMessage("https://www.curseforge.com/minecraft/mc-mods/veinminer-companion");
-                    player.sendMessage("Supports " + ChatFormat.GRAY + "Fabric" + ChatFormat.RESET + " (support for " + ChatFormat.GRAY + "Forge" + ChatFormat.RESET + " Soon™)");
+                    player.sendMessage("対応している前提MOD: " + ChatFormat.GRAY + "Fabric" + ChatFormat.RESET + " (" + ChatFormat.GRAY + "Forge" + ChatFormat.RESET + " の対応は近日対応予定™)");
                 }
 
                 return true;
             }
 
             veinMinerPlayer.setActivationStrategy(strategy);
-            player.sendMessage(ChatFormat.GREEN + "Mode successfully changed to " + ChatFormat.YELLOW + strategy.name().toLowerCase().replace("_", " ") + ChatFormat.GREEN + ".");
+            player.sendMessage(ChatFormat.GREEN + "モードを " + ChatFormat.YELLOW + strategy.name().toLowerCase().replace("_", " ") + ChatFormat.GREEN + " に変更しました。");
             return true;
         }
 
@@ -196,12 +198,12 @@ public final class CommandVeinMiner implements Command {
 
         else if (args[0].equalsIgnoreCase("pattern")) {
             if (!(sender instanceof PlatformPlayer player)) {
-                sender.sendMessage("Vein miner patterns cannot be changed from the console.");
+                sender.sendMessage("一括破壊のパターンはコンソールからは変更できません。");
                 return true;
             }
 
             if (!sender.hasPermission(VeinMinerConstants.PERMISSION_COMMAND_PATTERN)) {
-                sender.sendMessage(ChatFormat.RED + "You have insufficient permissions to execute this command.");
+                sender.sendMessage(ChatFormat.RED + "このコマンドを実行するには権限が不足しています。");
                 return true;
             }
 
@@ -213,13 +215,13 @@ public final class CommandVeinMiner implements Command {
             NamespacedKey patternKey = NamespacedKey.fromString(args[1], "veinminer");
             VeinMiningPattern pattern = veinMiner.getPatternRegistry().get(patternKey);
             if (pattern == null) {
-                sender.sendMessage(ChatFormat.RED + "A pattern with the key " + patternKey + " could not be found.");
+                sender.sendMessage(ChatFormat.RED + "「" + patternKey + "」 というパターンは見つかりませんでした。");
                 return true;
             }
 
             String permission = pattern.getPermission();
             if (permission != null && !player.hasPermission(permission)) {
-                sender.sendMessage(ChatFormat.RED + "You do not have permission to use this pattern.");
+                sender.sendMessage(ChatFormat.RED + "このパターンを使用するには権限が不足しています。");
                 return true;
             }
 
@@ -236,28 +238,28 @@ public final class CommandVeinMiner implements Command {
             pattern = event.getNewPattern();
             veinMinerPlayer.setVeinMiningPattern(pattern);
 
-            sender.sendMessage(ChatFormat.GREEN + "Pattern set to " + pattern.getKey() + ".");
+            sender.sendMessage(ChatFormat.GREEN + "パターンを「" + pattern.getKey() + "」に変更しました。");
             return true;
         }
 
         else if (args[0].equalsIgnoreCase("import")) {
             if (!(veinMiner.getPersistentDataStorage() instanceof PersistentDataStorageSQL dataStorage)) {
-                sender.sendMessage(ChatFormat.RED + "You are not using MySQL or SQLite storage. You do not need to import data.");
+                sender.sendMessage(ChatFormat.RED + "MySQLやSQLiteを使用していないため、データをインポートする必要はありません。");
                 return true;
             }
 
             if (System.currentTimeMillis() - requiresConfirmation.getOrDefault(sender, 0L) > IMPORT_CONFIRMATION_TIME_MILLIS) {
-                sender.sendMessage(ChatFormat.RED.toString() + ChatFormat.BOLD + "WARNING!");
-                sender.sendMessage(ChatFormat.DARK_RED.toString() + ChatFormat.ITALIC + "This is a destructive operation");
+                sender.sendMessage(ChatFormat.RED.toString() + ChatFormat.BOLD + "警告!");
+                sender.sendMessage(ChatFormat.DARK_RED.toString() + ChatFormat.ITALIC + "これは破壊的な行動です。");
                 sender.sendMessage("");
                 sender.sendMessage("""
-                        The import command is meant to import data from JSON storage from before the 2.0.0 update.
-                        This includes only the player's preferred activation strategy and their disabled categories.
-                        If a JSON file represents the data of a player already in the new VeinMiner database, it will overwrite what is in the database.
-                        Depending on the amount of unique players on your server, this process may take time.
-
-                        You only need to do this import once.
-                        You have 20 seconds to run "/veinminer import" to confirm.
+                        importコマンドは、2.0.0アップデート以前のJSONストレージからデータをインポートするためのものです。
+                        これには、プレーヤーの好みの活性化戦略と無効化されたカテゴリのみが含まれます。
+                        JSONファイルがすでに新しいVeinMinerデータベースにあるプレーヤーのデータを表している場合、データベース内のデータが上書きされます。
+                        サーバー上のユニークプレーヤーの数によっては、この処理に時間がかかることがあります。
+    
+                        このインポートは一度だけ行う必要があります。
+                        20秒以内に「/veinminer import」を実行して確認してください。
                         """);
 
                 this.requiresConfirmation.put(sender, System.currentTimeMillis());
@@ -358,7 +360,7 @@ public final class CommandVeinMiner implements Command {
     private String getUpdateSuffix() {
         return veinMiner.getPlatform().getUpdateChecker().getLastUpdateResult()
                 .filter(UpdateResult::isUpdateAvailable)
-                .map(result -> " (" + ChatFormat.GREEN + ChatFormat.BOLD + "UPDATE AVAILABLE!" + ChatFormat.GRAY + ")")
+                .map(result -> " (" + ChatFormat.GREEN + ChatFormat.BOLD + "アップデートが可能です!" + ChatFormat.GRAY + ")")
                 .orElseGet(() -> "");
     }
 
