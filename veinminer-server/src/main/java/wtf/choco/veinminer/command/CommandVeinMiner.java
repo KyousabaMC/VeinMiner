@@ -117,6 +117,12 @@ public final class CommandVeinMiner implements Command {
 
                 veinMinerPlayer.setVeinMinerEnabled(category, !veinMinerPlayer.isVeinMinerEnabled(category));
                 player.sendMessage(ChatFormat.YELLOW + category.getId().toLowerCase()
+                        .replace("axe", "斧")
+                        .replace("hand", "手")
+                        .replace("hoe", "クワ")
+                        .replace("pickaxe", "ピッケル")
+                        .replace("shears", "ハサミ")
+                        .replace("shovel", "シャベル")
                     + ChatFormat.GRAY + "の一括破壊を "
                     + (veinMinerPlayer.isVeinMinerEnabled(category)
                             ? ChatFormat.GREEN.toString() + ChatFormat.BOLD + "ON"
@@ -182,7 +188,14 @@ public final class CommandVeinMiner implements Command {
             }
 
             veinMinerPlayer.setActivationStrategy(strategy);
-            player.sendMessage(ChatFormat.GREEN + "モードを " + ChatFormat.YELLOW + strategy.name().toLowerCase().replace("_", " ") + ChatFormat.GREEN + " に変更しました。");
+            player.sendMessage(ChatFormat.GREEN + "モードを "
+                    + ChatFormat.YELLOW + strategy.name().toLowerCase().replace("_", " ")
+                    .replace("always", "常に有効(always)")
+                    .replace("client", "クライアント(client)")
+                    .replace("none", "無効(none)")
+                    .replace("sneak", "スニーク時(sneak)")
+                    .replace("stand", "立っている時(stand)")
+                    + ChatFormat.GREEN + " に変更しました。");
             return true;
         }
 
